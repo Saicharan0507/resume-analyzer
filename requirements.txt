@@ -1,5 +1,8 @@
-streamlit
-scikit-learn
-PyPDF2
-pandas
+fastapi
+uvicorn
+python-multipart
 sentence-transformers
+streamlit
+requests
+pandas
+PyPDF2

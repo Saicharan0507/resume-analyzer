@@ -17,7 +17,6 @@ def login():
     if st.button("Login"):
         if user == "admin" and pwd == "1234":
             st.session_state.logged_in = True
-            st.rerun() # Refresh to let user through
         else:
             st.error("Invalid credentials")
 
@@ -30,95 +29,74 @@ st.title("🚀 AI Hiring SaaS Platform")
 
 tab1, tab2, tab3 = st.tabs(["📄 Single", "📊 Bulk Ranking", "📂 Database"])
 
-# Backend is running locally on port 10000 
-BACKEND_URL = "http://localhost:10000"
+BACKEND_URL = "https://your-backend-url"
 
 # -------- SINGLE --------
 with tab1:
-    jd = st.text_area("Job Description", value="Looking for a Python developer with machine learning, SQL, and data analysis skills.")
+    jd = st.text_area("Job Description")
 
-    file = st.file_uploader("Upload Resume", type=["pdf"])
+    file = st.file_uploader("Upload Resume")
 
     if st.button("Analyze"):
         if file and jd:
-            with st.spinner("Connecting to FastAPI Backend..."):
-                res = requests.post(
-                    f"{BACKEND_URL}/analyze/",
-                    files={"file": (file.name, file.getvalue(), "application/pdf")},
-                    data={"job_desc": jd}
-                )
+            res = requests.post(
+                f"{BACKEND_URL}/analyze/",
+                files={"file": file},
+                data={"job_desc": jd}
+            )
 
-                if res.status_code == 200:
-                    score = res.json()["score"]
+            score = res.json()["score"]
 
-                    st.progress(int(score))
-                    if score > 80:
-                        st.success(f"Excellent Match: {score:.2f}% 🚀")
-                    elif score > 60:
-                        st.warning(f"Good Match: {score:.2f}% ⚠️")
-                    else:
-                        st.error(f"Low Match: {score:.2f}% ❌")
-                else:
-                    st.error("Backend failed. Make sure FastAPI is running on port 10000!")
+            st.progress(int(score))
+            st.success(f"Score: {score:.2f}%")
 
 # -------- BULK --------
 with tab2:
-    jd_bulk = st.text_area("Job Description", key="bulk", value="Looking for a Python developer with machine learning, SQL, and data analysis skills.")
+    jd = st.text_area("Job Description", key="bulk")
 
-    files = st.file_uploader("Upload Multiple", type=["pdf"], accept_multiple_files=True)
+    files = st.file_uploader("Upload Multiple", accept_multiple_files=True)
 
     if st.button("Run Ranking"):
-        if files and jd_bulk:
-            with st.spinner("Ranking all candidates..."):
-                results = []
+        results = []
 
-                for f in files:
-                    res = requests.post(
-                        f"{BACKEND_URL}/analyze/",
-                        files={"file": (f.name, f.getvalue(), "application/pdf")},
-                        data={"job_desc": jd_bulk}
-                    )
+        for file in files:
+            res = requests.post(
+                f"{BACKEND_URL}/analyze/",
+                files={"file": file},
+                data={"job_desc": jd}
+            )
 
-                    if res.status_code == 200:
-                        score = res.json()["score"]
-                        results.append({
-                            "Name": f.name,
-                            "Score": round(score, 2)
-                        })
+            score = res.json()["score"]
 
-                if results:
-                    df = pd.DataFrame(results).sort_values(by="Score", ascending=False)
+            results.append({
+                "Name": file.name,
+                "Score": round(score, 2)
+            })
 
-                    st.subheader("🏆 Top Candidate")
-                    st.write(df.iloc[0])
+        df = pd.DataFrame(results).sort_values(by="Score", ascending=False)
 
-                    st.dataframe(df)
-                    st.bar_chart(df.set_index("Name"))
+        st.subheader("🏆 Top Candidate")
+        st.write(df.iloc[0])
 
-                    # Download
-                    csv = df.to_csv(index=False).encode()
-                    st.download_button("Download Results", csv, "results.csv", "text/csv")
-                else:
-                    st.error("Failed to generate results from Backend.")
+        st.dataframe(df)
+        st.bar_chart(df.set_index("Name"))
+
+        # Download
+        csv = df.to_csv(index=False).encode()
+        st.download_button("Download Results", csv, "results.csv")
 
 # -------- DATABASE --------
 with tab3:
     st.subheader("📂 Stored Candidates")
 
-    if st.button("Refresh Database"):
-        try:
-            res = requests.get(f"{BACKEND_URL}/candidates/")
-            if res.status_code == 200:
-                data = res.json()
-                df = pd.DataFrame(data)
+    res = requests.get(f"{BACKEND_URL}/candidates/")
+    data = res.json()
 
-                if not df.empty:
-                    df = df.sort_values(by="score", ascending=False)
-                    st.dataframe(df)
-                    st.bar_chart(df.set_index("name"))
-                else:
-                    st.info("Database is empty. Analyze some resumes first!")
-            else:
-                st.error("Could not fetch data.")
-        except:
-             st.error("Cannot connect to backend database.")
+    df = pd.DataFrame(data)
+
+    if not df.empty:
+        df = df.sort_values(by="score", ascending=False)
+        st.dataframe(df)
+        st.bar_chart(df.set_index("name"))
+    else:
+        st.info("No data yet")

@@ -28,6 +28,11 @@ def calculate_match_bert(resume_text, job_desc):
     # Return as percentage
     return round(float(score) * 100, 2)
 
+def get_missing_skills(resume_text, job_desc):
+    job_words = set([w.strip().lower() for w in job_desc.replace(',', ' ').replace('.', ' ').split() if len(w) > 4])
+    resume_words = set([w.strip().lower() for w in resume_text.replace(',', ' ').replace('.', ' ').split() if len(w) > 4])
+    return list(job_words - resume_words)
+
 def generate_suggestions(score, missing_skills):
     suggestions = []
 

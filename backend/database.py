@@ -1,8 +1,30 @@
-from pymongo import MongoClient
+import sqlite3
 
-client = MongoClient("YOUR_MONGODB_URL")
-db = client["resume_db"]
-collection = db["candidates"]
+DB_PATH = "candidates.db"
+
+def init_db():
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS candidates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                score REAL
+            )
+        ''')
+        conn.commit()
+
+init_db()
 
 def save_candidate(data):
-    collection.insert_one(data)
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO candidates (name, score) VALUES (?, ?)", (data['name'], data['score']))
+        conn.commit()
+
+def get_candidates():
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, score FROM candidates ORDER BY score DESC")
+        rows = cursor.fetchall()
+        return [{"name": row[0], "score": row[1]} for row in rows]

@@ -1,7 +1,10 @@
 fastapi
 uvicorn
-pymongo
+python-multipart
 sentence-transformers
 streamlit
 requests
 pandas
+PyPDF2
+spacy
+reportlab

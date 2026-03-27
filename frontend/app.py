@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+import altair as alt
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 
 st.set_page_config(page_title="AI Hiring OS", layout="wide")
@@ -108,8 +109,32 @@ if menu == "Dashboard":
             col2.metric("📈 Avg Score", round(df["score"].mean(), 2))
             col3.metric("🏆 Top Score", round(df["score"].max(), 2))
 
-            st.subheader("📊 Score Distribution")
-            st.bar_chart(df["score"])
+            st.markdown("---")
+            st.subheader("📈 Pipeline Analytics")
+            
+            chart_col1, chart_col2 = st.columns(2)
+            
+            with chart_col1:
+                st.markdown("**Candidate Match Scores**")
+                score_chart = alt.Chart(df).mark_bar(color='#4CAF50').encode(
+                    x=alt.X('name', title='Candidate', sort='-y'),
+                    y=alt.Y('score', title='Match Score (%)'),
+                    tooltip=['name', 'score', 'status']
+                ).properties(height=350)
+                st.altair_chart(score_chart, use_container_width=True)
+                
+            with chart_col2:
+                st.markdown("**Hiring Funnel Status Distribution**")
+                status_counts = df['status'].value_counts().reset_index()
+                status_counts.columns = ['status', 'count']
+                
+                funnel_chart = alt.Chart(status_counts).mark_arc(innerRadius=50).encode(
+                    theta=alt.Theta(field="count", type="quantitative"),
+                    color=alt.Color(field="status", type="nominal", scale=alt.Scale(scheme='category20b')),
+                    tooltip=['status', 'count']
+                ).properties(height=350)
+                st.altair_chart(funnel_chart, use_container_width=True)
+
         else:
             st.info("No data available yet")
     except:

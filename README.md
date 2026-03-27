@@ -1,29 +1,45 @@
-# AI Resume Analyzer
+# 🚀 AI Hiring OS
+*Next-Gen AI-Powered Recruitment & ATS Platform*
 
-An AI-powered resume analyzer using BERT embeddings that evaluates resume-job alignment, identifies missing skills, and provides intelligent recommendations. The system also supports multi-resume ranking and job role prediction.
+**AI Hiring OS** is a full-stack SaaS Enterprise application that automates resume screening, ranks candidates using cutting-edge NLP, and provides a fully interactive recruiter dashboard to manage the hiring pipeline. Designed to reduce human screening time by 80%.
 
-## Features
-- **AI Resume Analyzer**: Compares resumes against job descriptions.
-- **BERT-based NLP Model**: Uses `sentence-transformers` (`all-MiniLM-L6-v2`).
-- **Smart Suggestions**: Highlights missing skills and gives actionable advice.
-- **Multi-Resume Ranking**: Evaluates multiple candidates simultaneously.
-- **Job Recommendations**: Recommends job roles based on candidate's skills.
-- **Streamlit UI**: Includes progress bars, color grading, and comparison charts.
+---
 
-## Deployment on Streamlit Cloud (100% Free)
-Follow these exact steps to deploy without errors:
+### 🌟 Core Capabilities
+- **AI Resume Screening:** Instantly calculates the mathematical Contextual Cosine Similarity between a candidate's resume and a job description using `Sentence-Transformers`.
+- **Bulk Ranking System:** Upload 100s of resumes at once. The engine will parse, score, and rank them instantaneously, explicitly flagging the "Top Candidate" for recruiters.
+- **NLP Keyword Parsing:** Uses `Spacy (en_core_web_sm)` to intelligently extract highly specific technical skills (e.g., Python, AWS, React) out of raw binary PDF bytes.
+- **Advanced Recruiter Dashboard:** Built entirely with Streamlit and Altair Graphing, featuring interactive Pipeline Funnel doughnut charts and live Score Distribution analytics.
+- **Persistent Database:** A robust SQLite pipeline that permanently saves scores, statuses, and technical matches, allowing recruiters to push candidates iteratively through the interview series (Applied → Shortlisted → Selected).
+- **Automated Workflows:** Built-in PDF Download generation and modular Automated Emailing capabilities.
+- **Smart Analytics Search:** Find candidates deeply buried in your system by dynamically filtering technical skills!
 
-1. **Upload Project to GitHub**
-   - Go to [GitHub](https://github.com/) and click "New Repository".
-   - Upload the following files: `app.py`, `utils.py`, `requirements.txt`.
+---
 
-2. **Deploy on Streamlit Community Cloud**
-   - Go to [Streamlit Community Cloud](https://streamlit.io/cloud).
-   - Click "New App".
-   - Connect your GitHub account.
-   - Select your newly created repository.
-   - Set the **Main file path** to `app.py`.
+### 🏗️ Modular Tech Stack
+- **Backend Engine:** FastAPI, Python, SQLite, Uvicorn
+- **Frontend Dashboard:** Streamlit, Pandas, Altair, Reportlab
+- **AI / NLP Architecture:** HuggingFace `all-MiniLM-L6-v2`, advanced `Spacy`, strict `PyPDF2` data buffering.
 
-3. **Click DEPLOY 🚀**
+---
 
-*Note: The code gracefully handles PDF errors and safely configures the BERT model to run on the CPU (`device='cpu'`) to ensure compatibility with Streamlit Cloud's free tier environments.*
+### ⚡ Quickstart Setup (Local Environment)
+This architecture is cleanly decoupled into a microservices pattern (Backend API + Frontend GUI).
+
+**1. Start the Machine Learning API Server (Terminal 1):**
+```powershell
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+python -m uvicorn backend.main:app --port 10000 --reload
+```
+
+**2. Start the Hiring Dashboard (Terminal 2):**
+```powershell
+streamlit run frontend/app.py
+```
+
+*Default Sandbox Credentials:* Username: `admin` | Password: `1234`
+
+---
+
+*Built independently by Sai Charan* 🚀
